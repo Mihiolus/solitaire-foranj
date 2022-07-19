@@ -62,6 +62,7 @@ SpriteAtlas:
   - {fileID: 21300000, guid: 07d7be223d8108649a1266b432188235, type: 3}
   - {fileID: 21300000, guid: f46833427c363fc4ea044854bccaf49c, type: 3}
   - {fileID: 21300000, guid: ae3257527d988a34999ddb38d9f6a9b4, type: 3}
+  - {fileID: 21300000, guid: a9d9d83351fb2dd4aa96d83cdac7ad90, type: 3}
   - {fileID: 21300000, guid: 96243f630298038458aae95af0f30fc4, type: 3}
   - {fileID: 21300000, guid: 157ceaf35b282b8469f7b4ec499a2c85, type: 3}
   - {fileID: 21300000, guid: a18770240c36bb140a6196b5747c86f7, type: 3}
@@ -117,6 +118,7 @@ SpriteAtlas:
   - cardHearts5
   - cardSpades2
   - cardClubsK
+  - background
   - cardClubs4
   - cardDiamondsK
   - cardClubs3
