@@ -1,26 +1,49 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.U2D;
 
 public class Generator : MonoBehaviour
 {
     [SerializeField]
-    private int _groupsOnField = 4;
+    private SpriteAtlas _cardFronts;
 
     // Start is called before the first frame update
     void Start()
     {
         var cards = GameObject.FindGameObjectsWithTag("Card");
-        var cardSize = cards[0].GetComponent<RectTransform>().rect;
-        //Find field dimensions
-        var bottomLeft = Camera.main.ViewportToScreenPoint(Vector3.zero);
-        var topRight = Camera.main.ViewportToScreenPoint(Vector3.one);
-        Vector3 randPos = new Vector3();
+        Dictionary<Transform, SortedList<int, Transform>> groups = new Dictionary<Transform, SortedList<int, Transform>>();
         foreach (var c in cards)
         {
-            randPos.x = Random.Range(bottomLeft.x + cardSize.width,topRight.x - cardSize.width);
-            randPos.y = Random.Range(bottomLeft.y + cardSize.height, topRight.y - cardSize.height);
-            c.transform.position = randPos;
+            if (!groups.ContainsKey(c.transform.parent))
+            {
+                groups.Add(c.transform.parent, new SortedList<int, Transform>());
+            }
+            groups[c.transform.parent].Add(c.transform.GetSiblingIndex(), c.transform);
+        }
+        Sprite[] sprites = new Sprite[_cardFronts.spriteCount];
+        int spriteN = _cardFronts.GetSprites(sprites);
+        Card card;
+        foreach (var g in groups.Keys)
+        {
+            for (int i = 0; i < groups[g].Count; i++)
+            {
+                card = groups[g][i].GetComponent<Card>();
+                if (i > 0)
+                {
+                    card.Ancestor = groups[g][i - 1].GetComponent<Card>();
+                }
+                if (i < groups[g].Count - 1)
+                {
+                    card.Descendant = groups[g][i + 1].GetComponent<Card>();
+                }
+                var sprite = sprites[Random.Range(0, spriteN)];
+                card.SetFrontImage(sprite);
+                if (i == groups[g].Count - 1)
+                {
+                    card.IsOpen = true;
+                }
+            }
         }
     }
 }
