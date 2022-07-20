@@ -7,6 +7,10 @@ public class Generator : MonoBehaviour
     [SerializeField]
     [Range(0, 1)]
     private float _ascendingChance = 0.65f, _directionChangeChance = 0.15f;
+    [SerializeField]
+    private Card _prefab;
+    [SerializeField]
+    private RectTransform _deck;
 
     // Start is called before the first frame update
     void Start()
@@ -14,6 +18,7 @@ public class Generator : MonoBehaviour
         Transform[][] groups = GetSortedGroups();
         var sprites = GetComponent<ISpriteLoader>().GetSortedSprites();
         var combos = GetCombinations();
+        FindValidShuffle(groups, combos);
         Card card;
         Sprite sprite;
         foreach (var g in groups)
@@ -29,7 +34,7 @@ public class Generator : MonoBehaviour
                 {
                     card.Descendant = g[i + 1].GetComponent<Card>();
                 }
-                sprite = sprites[Random.Range(0, sprites.Count)][Random.Range(0, 4)];
+                sprite = sprites[card.Rank][Random.Range(0, 4)];
                 card.SetFrontImage(sprite);
                 if (i == g.Length - 1)
                 {
@@ -37,7 +42,6 @@ public class Generator : MonoBehaviour
                 }
             }
         }
-        FindValidShuffle(groups, combos);
     }
 
     ///<returns>Groups of card transforms as they are on the field under different parent transforms, sorted according to their order in the inspector</returns>
@@ -112,8 +116,12 @@ public class Generator : MonoBehaviour
         {
             lastIndexInGroup[i] = 9;
         }
+        List<Card> deckCards = new List<Card>();
         foreach (var combo in combinations)
         {
+            var deckCard = Instantiate(_prefab,_deck);
+            deckCard.Rank = combo[0];
+            deckCards.Add(deckCard);
             for (int i = 1; i < combo.Count; i++)
             {
                 int value = combo[i];
@@ -126,5 +134,6 @@ public class Generator : MonoBehaviour
                 lastIndexInGroup[group]--;
             }
         }
+        deckCards[deckCards.Count-1].IsOpen = true;
     }
 }
