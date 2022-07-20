@@ -22,15 +22,16 @@ public class SpriteLoader : MonoBehaviour, ISpriteLoader
         Sprite[] allSprites = new Sprite[_atlas.spriteCount];
         SortedList<int, List<Sprite>> sortedSprites = new SortedList<int, List<Sprite>>();
         _atlas.GetSprites(allSprites);
+        var regex = new Regex(@"(\d{1,2}|A|J|Q|K)$");
         foreach (var s in allSprites)
         {
             //Copy because the sprite needs the original name
-            string name = string.Copy(s.name);
+            string name = s.name;
             //Remove the "(Clone)" suffix that Unity adds to packed sprites
             int index = name.IndexOf("(Clone)");
             name = name.Remove(index);
             //Regex for 1-2 digits or letter at the end
-            var match = Regex.Match(name, @"(\d{1,2}|A|J|Q|K)$");
+            var match = regex.Match(name);
             if (match.Success)
             {
                 int value;
