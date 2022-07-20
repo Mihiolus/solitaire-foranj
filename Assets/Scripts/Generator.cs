@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -38,6 +37,7 @@ public class Generator : MonoBehaviour
                 }
             }
         }
+        FindValidShuffle(groups, combos);
     }
 
     ///<returns>Groups of card transforms as they are on the field under different parent transforms, sorted according to their order in the inspector</returns>
@@ -53,7 +53,7 @@ public class Generator : MonoBehaviour
             }
             groups[c.transform.parent].Add(c.transform.GetSiblingIndex(), c.transform);
         }
-        
+
         //Convert to a simple array
         Transform[][] results = new Transform[4][];
         int groupIndex = 0;
@@ -63,9 +63,8 @@ public class Generator : MonoBehaviour
             results[groupIndex] = new Transform[10];
             foreach (var item in groups[key])
             {
-                Debug.Log("["+groupIndex+"]["+cardIndex+"]");
                 results[groupIndex][cardIndex] = item.Value;
-                cardIndex ++;
+                cardIndex++;
             }
             groupIndex++;
         }
@@ -104,5 +103,28 @@ public class Generator : MonoBehaviour
             }
         }
         return results;
+    }
+
+    private void FindValidShuffle(Transform[][] cardGroups, List<List<int>> combinations)
+    {
+        int[] lastIndexInGroup = new int[4];
+        for (int i = 0; i < 4; i++)
+        {
+            lastIndexInGroup[i] = 9;
+        }
+        foreach (var combo in combinations)
+        {
+            for (int i = 1; i < combo.Count; i++)
+            {
+                int value = combo[i];
+                int group;
+                do
+                {
+                    group = Random.Range(0, 4);
+                } while (lastIndexInGroup[group] < 0);
+                cardGroups[group][lastIndexInGroup[group]].GetComponent<Card>().Rank = value;
+                lastIndexInGroup[group]--;
+            }
+        }
     }
 }

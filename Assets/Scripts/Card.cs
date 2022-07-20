@@ -34,4 +34,6 @@ public class Card : MonoBehaviour
             _back.SetActive(!value);
         }
     }
+
+    public int Rank;
 }
