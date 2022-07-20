@@ -1416,6 +1416,7 @@ GameObject:
   m_Component:
   - component: {fileID: 504279590}
   - component: {fileID: 504279589}
+  - component: {fileID: 504279591}
   m_Layer: 0
   m_Name: Generator
   m_TagString: Untagged
@@ -1435,7 +1436,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 35d425fe5d6f5f348a6706a7cfb670e2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _cardFronts: {fileID: 4343727234628468602, guid: 2b63e678be2831e4585b4b3564c76faf, type: 2}
+  _ascendingChance: 0.65
+  _directionChangeChance: 0.15
 --- !u!4 &504279590
 Transform:
   m_ObjectHideFlags: 0
@@ -1451,6 +1453,19 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &504279591
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 504279588}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76bd4dcfe03b6334ebd4a2734e36fd0e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _atlas: {fileID: 4343727234628468602, guid: 2b63e678be2831e4585b4b3564c76faf, type: 2}
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
