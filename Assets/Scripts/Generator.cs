@@ -1,18 +1,50 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.U2D;
 
 public class Generator : MonoBehaviour
 {
+    [Header("Card sequence probabilities")]
     [SerializeField]
-    private SpriteAtlas _cardFronts;
+    [Range(0, 1)]
+    private float _ascendingChance = 0.65f, _directionChangeChance = 0.15f;
 
     // Start is called before the first frame update
     void Start()
     {
-        var cards = GameObject.FindGameObjectsWithTag("Card");
+        Transform[][] groups = GetSortedGroups();
+        var sprites = GetComponent<ISpriteLoader>().GetSortedSprites();
+        var combos = GetCombinations();
+        Card card;
+        Sprite sprite;
+        foreach (var g in groups)
+        {
+            for (int i = 0; i < g.Length; i++)
+            {
+                card = g[i].GetComponent<Card>();
+                if (i > 0)
+                {
+                    card.Ancestor = g[i - 1].GetComponent<Card>();
+                }
+                if (i < g.Length - 1)
+                {
+                    card.Descendant = g[i + 1].GetComponent<Card>();
+                }
+                sprite = sprites[Random.Range(0, sprites.Count)][Random.Range(0, 4)];
+                card.SetFrontImage(sprite);
+                if (i == g.Length - 1)
+                {
+                    card.IsOpen = true;
+                }
+            }
+        }
+    }
+
+    ///<returns>Groups of card transforms as they are on the field under different parent transforms, sorted according to their order in the inspector</returns>
+    private static Transform[][] GetSortedGroups()
+    {
         Dictionary<Transform, SortedList<int, Transform>> groups = new Dictionary<Transform, SortedList<int, Transform>>();
+        var cards = GameObject.FindGameObjectsWithTag("Card");
         foreach (var c in cards)
         {
             if (!groups.ContainsKey(c.transform.parent))
@@ -21,29 +53,56 @@ public class Generator : MonoBehaviour
             }
             groups[c.transform.parent].Add(c.transform.GetSiblingIndex(), c.transform);
         }
-        Sprite[] sprites = new Sprite[_cardFronts.spriteCount];
-        int spriteN = _cardFronts.GetSprites(sprites);
-        Card card;
-        foreach (var g in groups.Keys)
+        
+        //Convert to a simple array
+        Transform[][] results = new Transform[4][];
+        int groupIndex = 0;
+        foreach (var key in groups.Keys)
         {
-            for (int i = 0; i < groups[g].Count; i++)
+            int cardIndex = 0;
+            results[groupIndex] = new Transform[10];
+            foreach (var item in groups[key])
             {
-                card = groups[g][i].GetComponent<Card>();
-                if (i > 0)
+                Debug.Log("["+groupIndex+"]["+cardIndex+"]");
+                results[groupIndex][cardIndex] = item.Value;
+                cardIndex ++;
+            }
+            groupIndex++;
+        }
+        return results;
+    }
+
+    private List<List<int>> GetCombinations()
+    {
+        List<List<int>> results = new List<List<int>>();
+        int remainingCards = 40;
+        int start, number, value;
+        bool ascending;
+        while (remainingCards > 0)
+        {
+            start = Random.Range(0, 13);
+            results.Add(new List<int>());
+            results[results.Count - 1].Add(start);
+            value = start;
+            number = Mathf.Min(Random.Range(2, 8), remainingCards);
+            ascending = Random.value < _ascendingChance;
+            while (number > 0)
+            {
+                value += ascending ? 1 : -1;
+                if (value > 12)
                 {
-                    card.Ancestor = groups[g][i - 1].GetComponent<Card>();
+                    value = 0;
                 }
-                if (i < groups[g].Count - 1)
+                else if (value < 0)
                 {
-                    card.Descendant = groups[g][i + 1].GetComponent<Card>();
+                    value = 12;
                 }
-                var sprite = sprites[Random.Range(0, spriteN)];
-                card.SetFrontImage(sprite);
-                if (i == groups[g].Count - 1)
-                {
-                    card.IsOpen = true;
-                }
+                results[results.Count - 1].Add(value);
+                number--;
+                remainingCards--;
+                ascending = Random.value < _directionChangeChance ? !ascending : ascending;
             }
         }
+        return results;
     }
 }
