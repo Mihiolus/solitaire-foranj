@@ -7,7 +7,7 @@ public interface ISpriteLoader
 {
     ///<returns> Card sprites sorted from A = 0, to King = 12;
     /// suit order not guaranteed </returns>
-    SortedList<int, List<Sprite>> GetSortedSprites();
+    List<Sprite>[] GetSortedSprites();
 }
 
 public class SpriteLoader : MonoBehaviour, ISpriteLoader
@@ -18,10 +18,10 @@ public class SpriteLoader : MonoBehaviour, ISpriteLoader
     private SpriteAtlas _atlas;
     private readonly Regex _nameValueRegex = new Regex(@"(\d{1,2}|A|J|Q|K)(?:\(Clone\))?$", RegexOptions.Compiled);
 
-    public SortedList<int, List<Sprite>> GetSortedSprites()
+    public List<Sprite>[] GetSortedSprites()
     {
         Sprite[] allSprites = new Sprite[_atlas.spriteCount];
-        SortedList<int, List<Sprite>> sortedSprites = new SortedList<int, List<Sprite>>();
+        List<Sprite>[] sortedSprites = new List<Sprite>[13];
         _atlas.GetSprites(allSprites);
         foreach (var s in allSprites)
         {
@@ -29,9 +29,9 @@ public class SpriteLoader : MonoBehaviour, ISpriteLoader
             if (match.Success)
             {
                 int rank = StringToRank(match.Groups[1].Value);
-                if (!sortedSprites.ContainsKey(rank))
+                if (sortedSprites[rank]==null)
                 {
-                    sortedSprites.Add(rank, new List<Sprite>(4));
+                    sortedSprites[rank] = new List<Sprite>(4);
                 }
                 sortedSprites[rank].Add(s);
             }
