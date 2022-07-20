@@ -16,45 +16,44 @@ public class SpriteLoader : MonoBehaviour, ISpriteLoader
     [SerializeField]
     [Tooltip("Sprites' names end with a letter or number indicating their rank: A,2-10,J,Q,K")]
     private SpriteAtlas _atlas;
+    private readonly Regex _nameValueRegex = new Regex(@"(\d{1,2}|A|J|Q|K)(?: \(Clone\))?$");
+    public List<Sprite>[] sortedSprites;
 
     public SortedList<int, List<Sprite>> GetSortedSprites()
     {
         Sprite[] allSprites = new Sprite[_atlas.spriteCount];
         SortedList<int, List<Sprite>> sortedSprites = new SortedList<int, List<Sprite>>();
         _atlas.GetSprites(allSprites);
-        var regex = new Regex(@"(\d{1,2}|A|J|Q|K)$");
         foreach (var s in allSprites)
         {
-            //Copy because the sprite needs the original name
-            string name = s.name;
-            //Remove the "(Clone)" suffix that Unity adds to packed sprites
-            int index = name.IndexOf("(Clone)");
-            name = name.Remove(index);
-            //Regex for 1-2 digits or letter at the end
-            var match = regex.Match(name);
+            var match = _nameValueRegex.Match(s.name);
             if (match.Success)
             {
-                int value;
-
-                if (!int.TryParse(match.Value, out value))
+                int rank = StringToRank(match.Value);
+                if (!sortedSprites.ContainsKey(rank))
                 {
-                    switch (match.Value)
-                    {
-                        case "A": value = 1; break;
-                        case "J": value = 11; break;
-                        case "Q": value = 12; break;
-                        case "K": value = 13; break;
-                    }
+                    sortedSprites.Add(rank, new List<Sprite>(4));
                 }
-                // Don't forget to decrement value for 0-based numbering
-                value--;
-                if (!sortedSprites.ContainsKey(value))
-                {
-                    sortedSprites.Add(value, new List<Sprite>(4));
-                }
-                sortedSprites[value].Add(s);
+                sortedSprites[rank].Add(s);
             }
         }
         return sortedSprites;
+    }
+
+    private int StringToRank(string s)
+    {
+        int rank;
+        if (!int.TryParse(s, out rank))
+        {
+            switch (s)
+            {
+                case "A": rank = 1; break;
+                case "J": rank = 11; break;
+                case "Q": rank = 12; break;
+                case "K": rank = 13; break;
+            }
+        }
+        // Don't forget to decrement value for 0-based numbering
+        return rank - 1;
     }
 }
