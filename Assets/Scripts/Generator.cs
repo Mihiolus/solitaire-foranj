@@ -11,16 +11,16 @@ public class Generator : MonoBehaviour
     private Card _prefab;
     [SerializeField]
     private RectTransform _deck;
+    private List<Sprite>[] sortedSprites;
 
     // Start is called before the first frame update
     void Start()
     {
         Transform[][] groups = GetSortedGroups();
-        var sprites = GetComponent<ISpriteLoader>().GetSortedSprites();
+        sortedSprites = GetComponent<ISpriteLoader>().GetSortedSprites();
         var combos = GetCombinations();
         FindValidShuffle(groups, combos);
         Card card;
-        Sprite sprite;
         foreach (var g in groups)
         {
             for (int i = 0; i < g.Length; i++)
@@ -34,8 +34,6 @@ public class Generator : MonoBehaviour
                 {
                     card.Descendant = g[i + 1].GetComponent<Card>();
                 }
-                sprite = sprites[card.Rank][Random.Range(0, 4)];
-                card.SetFrontImage(sprite);
                 if (i == g.Length - 1)
                 {
                     card.IsOpen = true;
@@ -119,8 +117,9 @@ public class Generator : MonoBehaviour
         List<Card> deckCards = new List<Card>();
         foreach (var combo in combinations)
         {
-            var deckCard = Instantiate(_prefab,_deck);
+            var deckCard = Instantiate(_prefab, _deck);
             deckCard.Rank = combo[0];
+            deckCard.SetFrontImage(sortedSprites[deckCard.Rank][Random.Range(0, 4)]);
             deckCards.Add(deckCard);
             for (int i = 1; i < combo.Count; i++)
             {
@@ -130,10 +129,12 @@ public class Generator : MonoBehaviour
                 {
                     group = Random.Range(0, 4);
                 } while (lastIndexInGroup[group] < 0);
-                cardGroups[group][lastIndexInGroup[group]].GetComponent<Card>().Rank = value;
+                Card card = cardGroups[group][lastIndexInGroup[group]].GetComponent<Card>();
+                card.Rank = value;
+                card.SetFrontImage(sortedSprites[card.Rank][Random.Range(0, 4)]);
                 lastIndexInGroup[group]--;
             }
         }
-        deckCards[deckCards.Count-1].IsOpen = true;
+        deckCards[deckCards.Count - 1].IsOpen = true;
     }
 }
