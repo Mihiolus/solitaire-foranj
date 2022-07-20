@@ -16,8 +16,7 @@ public class SpriteLoader : MonoBehaviour, ISpriteLoader
     [SerializeField]
     [Tooltip("Sprites' names end with a letter or number indicating their rank: A,2-10,J,Q,K")]
     private SpriteAtlas _atlas;
-    private readonly Regex _nameValueRegex = new Regex(@"(\d{1,2}|A|J|Q|K)(?: \(Clone\))?$");
-    public List<Sprite>[] sortedSprites;
+    private readonly Regex _nameValueRegex = new Regex(@"(\d{1,2}|A|J|Q|K)(?:\(Clone\))?$", RegexOptions.Compiled);
 
     public SortedList<int, List<Sprite>> GetSortedSprites()
     {
@@ -29,7 +28,7 @@ public class SpriteLoader : MonoBehaviour, ISpriteLoader
             var match = _nameValueRegex.Match(s.name);
             if (match.Success)
             {
-                int rank = StringToRank(match.Value);
+                int rank = StringToRank(match.Groups[1].Value);
                 if (!sortedSprites.ContainsKey(rank))
                 {
                     sortedSprites.Add(rank, new List<Sprite>(4));
