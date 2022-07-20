@@ -1,12 +1,11 @@
 using UnityEngine;
 using UnityEngine.U2D;
-using System.Linq;
 using System.Text.RegularExpressions;
 using System.Collections.Generic;
 
 public interface ISpriteLoader
 {
-    ///<returns> Card sprites sorted from A = 1, to King = 13;
+    ///<returns> Card sprites sorted from A = 0, to King = 12;
     /// suit order not guaranteed </returns>
     SortedList<int, List<Sprite>> GetSortedSprites();
 }
@@ -25,9 +24,12 @@ public class SpriteLoader : MonoBehaviour, ISpriteLoader
         _atlas.GetSprites(allSprites);
         foreach (var s in allSprites)
         {
+            //Copy because the sprite needs the original name
             string name = string.Copy(s.name);
+            //Remove the "(Clone)" suffix that Unity adds to packed sprites
             int index = name.IndexOf("(Clone)");
             name = name.Remove(index);
+            //Regex for 1-2 digits or letter at the end
             var match = Regex.Match(name, @"(\d{1,2}|A|J|Q|K)$");
             if (match.Success)
             {
@@ -43,6 +45,8 @@ public class SpriteLoader : MonoBehaviour, ISpriteLoader
                         case "K": value = 13; break;
                     }
                 }
+                // Don't forget to decrement value for 0-based numbering
+                value--;
                 if (!sortedSprites.ContainsKey(value))
                 {
                     sortedSprites.Add(value, new List<Sprite>(4));
