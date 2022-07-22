@@ -24,7 +24,10 @@ public class GameController : MonoBehaviour
             card.MyLocation = CardModel.Location.InEndStack;
             _instance._model.EndStack.Add(card);
             _instance._view.MoveToEndStack(card);
-            _instance._model.FieldStacks[card.Stack][index-1].IsOpen = true;
+            if (card.Ancestor)
+            {
+                card.Ancestor.IsOpen = true;
+            }
             return true;
         }
         else if (card.MyLocation == CardModel.Location.InDeck
