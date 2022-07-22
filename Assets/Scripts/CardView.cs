@@ -1,22 +1,10 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public class Card : MonoBehaviour
+public class CardView : MonoBehaviour
 {
     [SerializeField]
     private GameObject _front, _back;
-    [SerializeField]
-    private Card _ancestor, _descendant;
-
-    public Card Ancestor
-    {
-        get => _ancestor; set => _ancestor = value;
-    }
-
-    public Card Descendant
-    {
-        get => _descendant; set => _descendant = value;
-    }
 
     public void SetFrontImage(Sprite sprite)
     {
@@ -34,6 +22,4 @@ public class Card : MonoBehaviour
             _back.SetActive(!value);
         }
     }
-
-    public int Rank;
 }

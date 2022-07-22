@@ -1436,7 +1436,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _ascendingChance: 0.65
   _directionChangeChance: 0.15
-  _prefab: {fileID: 6307130288499485500, guid: bcda7fdd07db2384e8a8bb771cc75fcd, type: 3}
+  _deckPrefab: {fileID: 131820109115513137, guid: bcda7fdd07db2384e8a8bb771cc75fcd, type: 3}
   _deck: {fileID: 596900089}
 --- !u!4 &504279590
 Transform:

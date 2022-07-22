@@ -8,7 +8,7 @@ public class Generator : MonoBehaviour
     [Range(0, 1)]
     private float _ascendingChance = 0.65f, _directionChangeChance = 0.15f;
     [SerializeField]
-    private Card _prefab;
+    private GameObject _deckPrefab;
     [SerializeField]
     private RectTransform _deck;
     private List<Sprite>[] sortedSprites;
@@ -20,23 +20,23 @@ public class Generator : MonoBehaviour
         sortedSprites = GetComponent<ISpriteLoader>().GetSortedSprites();
         var combos = GetCombinations();
         FindValidShuffle(groups, combos);
-        Card card;
+        CardModel card;
         foreach (var g in groups)
         {
             for (int i = 0; i < g.Length; i++)
             {
-                card = g[i].GetComponent<Card>();
+                card = g[i].GetComponent<CardModel>();
                 if (i > 0)
                 {
-                    card.Ancestor = g[i - 1].GetComponent<Card>();
+                    card.Ancestor = g[i - 1].GetComponent<CardModel>();
                 }
                 if (i < g.Length - 1)
                 {
-                    card.Descendant = g[i + 1].GetComponent<Card>();
+                    card.Descendant = g[i + 1].GetComponent<CardModel>();
                 }
                 if (i == g.Length - 1)
                 {
-                    card.IsOpen = true;
+                    card.GetComponent<CardView>().IsOpen = true;
                 }
             }
         }
@@ -114,12 +114,13 @@ public class Generator : MonoBehaviour
         {
             lastIndexInGroup[i] = 9;
         }
-        List<Card> deckCards = new List<Card>();
+        List<GameObject> deckCards = new List<GameObject>();
         foreach (var combo in combinations)
         {
-            var deckCard = Instantiate(_prefab, _deck);
-            deckCard.Rank = combo[0];
-            deckCard.SetFrontImage(sortedSprites[deckCard.Rank][Random.Range(0, 4)]);
+            var deckCard = Instantiate(_deckPrefab, _deck);
+            CardModel cardModel = deckCard.GetComponent<CardModel>();
+            cardModel.Rank = combo[0];
+            deckCard.GetComponent<CardView>().SetFrontImage(sortedSprites[cardModel.Rank][Random.Range(0, 4)]);
             deckCards.Add(deckCard);
             for (int i = 1; i < combo.Count; i++)
             {
@@ -129,12 +130,13 @@ public class Generator : MonoBehaviour
                 {
                     group = Random.Range(0, 4);
                 } while (lastIndexInGroup[group] < 0);
-                Card card = cardGroups[group][lastIndexInGroup[group]].GetComponent<Card>();
-                card.Rank = value;
-                card.SetFrontImage(sortedSprites[card.Rank][Random.Range(0, 4)]);
+                var card = cardGroups[group][lastIndexInGroup[group]];
+                CardModel cardModel1 = card.GetComponent<CardModel>();
+                cardModel1.Rank = value;
+                card.GetComponent<CardView>().SetFrontImage(sortedSprites[cardModel1.Rank][Random.Range(0, 4)]);
                 lastIndexInGroup[group]--;
             }
         }
-        deckCards[deckCards.Count - 1].IsOpen = true;
+        deckCards[deckCards.Count - 1].GetComponent<CardView>().IsOpen = true;
     }
 }
