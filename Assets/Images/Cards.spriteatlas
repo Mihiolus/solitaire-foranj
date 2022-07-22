@@ -78,6 +78,7 @@ SpriteAtlas:
   - {fileID: 21300000, guid: aea784b6b53d84d4aac95bec73c798e6, type: 3}
   - {fileID: 21300000, guid: ece175e6ba9b8574dbb6172ac5b824dc, type: 3}
   - {fileID: 21300000, guid: e02e16f6367e27d45990a1095c257866, type: 3}
+  - {fileID: 21300000, guid: 3b019f47658757a4cae28b34abe10368, type: 3}
   - {fileID: 21300000, guid: 4be94cc736335364f82f453fe03e223c, type: 3}
   - {fileID: 21300000, guid: 73375b1850357094f86677e6d0bce045, type: 3}
   - {fileID: 21300000, guid: 6df97d48c2024e149803bf38d5ab3efb, type: 3}
@@ -134,6 +135,7 @@ SpriteAtlas:
   - cardSpades10
   - cardClubs8
   - cardClubsJ
+  - anticlockwise-rotation
   - cardSpades4
   - cardSpades5
   - cardHearts3
