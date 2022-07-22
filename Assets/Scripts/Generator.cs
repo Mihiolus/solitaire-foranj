@@ -18,34 +18,37 @@ public class Generator : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        Transform[][] groups = GetSortedGroups();
+        var groups = GetSortedGroups();
         sortedSprites = GetComponent<ISpriteLoader>().GetSortedSprites();
         var combos = GetCombinations();
-        FindValidShuffle(groups, combos);
+        List<CardModel> deck;
+        InitShuffle(groups, combos, out deck);
+        _model.Init(groups, deck);
         CardModel card;
         foreach (var g in groups)
         {
-            for (int i = 0; i < g.Length; i++)
+            for (int i = 0; i < g.Count; i++)
             {
                 card = g[i].GetComponent<CardModel>();
                 if (i > 0)
                 {
                     card.Ancestor = g[i - 1].GetComponent<CardModel>();
                 }
-                if (i < g.Length - 1)
+                if (i < g.Count - 1)
                 {
                     card.Descendant = g[i + 1].GetComponent<CardModel>();
                 }
-                if (i == g.Length - 1)
+                if (i == g.Count - 1)
                 {
                     card.IsOpen = true;
                 }
             }
         }
+        GameController.TryMoveCard(_model.Deck[_model.Deck.Count - 1]);
     }
 
     ///<returns>Groups of card transforms as they are on the field under different parent transforms, sorted according to their order in the inspector</returns>
-    private static Transform[][] GetSortedGroups()
+    private List<CardModel>[] GetSortedGroups()
     {
         Dictionary<Transform, SortedList<int, Transform>> groups = new Dictionary<Transform, SortedList<int, Transform>>();
         var cards = GameObject.FindGameObjectsWithTag("Card");
@@ -58,16 +61,16 @@ public class Generator : MonoBehaviour
             groups[c.transform.parent].Add(c.transform.GetSiblingIndex(), c.transform);
         }
 
-        //Convert to a simple array
-        Transform[][] results = new Transform[4][];
+        //Convert
+        var results = new List<CardModel>[groups.Keys.Count];
         int groupIndex = 0;
         foreach (var key in groups.Keys)
         {
             int cardIndex = 0;
-            results[groupIndex] = new Transform[10];
+            results[groupIndex] = new List<CardModel>(groups[key].Count);
             foreach (var item in groups[key])
             {
-                results[groupIndex][cardIndex] = item.Value;
+                results[groupIndex].Add(item.Value.GetComponent<CardModel>());
                 cardIndex++;
             }
             groupIndex++;
@@ -109,36 +112,37 @@ public class Generator : MonoBehaviour
         return results;
     }
 
-    private void FindValidShuffle(Transform[][] cardGroups, List<List<int>> combinations)
+    private void InitShuffle(List<CardModel>[] cardGroups, List<List<int>> combinations, out List<CardModel> deck)
     {
-        int[] lastIndexInGroup = new int[4];
-        for (int i = 0; i < 4; i++)
+        int[] lastIndexInGroup = new int[cardGroups.Length];
+        for (int i = 0; i < cardGroups.Length; i++)
         {
             lastIndexInGroup[i] = 9;
         }
-        List<GameObject> deckCards = new List<GameObject>();
+        deck = new List<CardModel>();
         foreach (var combo in combinations)
         {
             var deckCard = Instantiate(_deckPrefab, _deck);
+            deckCard.transform.SetAsFirstSibling();
             CardModel cardModel = deckCard.GetComponent<CardModel>();
             cardModel.Rank = combo[0];
             deckCard.GetComponent<CardView>().SetFrontImage(sortedSprites[cardModel.Rank][Random.Range(0, 4)]);
-            deckCards.Add(deckCard);
+            deck.Add(cardModel);
             for (int i = 1; i < combo.Count; i++)
             {
                 int value = combo[i];
                 int group;
                 do
                 {
-                    group = Random.Range(0, 4);
+                    group = Random.Range(0, cardGroups.Length);
                 } while (lastIndexInGroup[group] < 0);
-                var card = cardGroups[group][lastIndexInGroup[group]];
-                cardModel = card.GetComponent<CardModel>();
+                cardModel = cardGroups[group][lastIndexInGroup[group]];
                 cardModel.Rank = value;
-                card.GetComponent<CardView>().SetFrontImage(sortedSprites[cardModel.Rank][Random.Range(0, 4)]);
+                cardModel.Stack = group;
+                cardModel.GetComponent<CardView>().SetFrontImage(sortedSprites[cardModel.Rank][Random.Range(0, 4)]);
                 lastIndexInGroup[group]--;
             }
         }
-        deckCards[deckCards.Count - 1].GetComponent<CardView>().IsOpen = true;
+        deck.Reverse();
     }
 }

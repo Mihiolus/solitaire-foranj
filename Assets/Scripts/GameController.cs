@@ -19,10 +19,12 @@ public class GameController : MonoBehaviour
         && card.IsOpen
         && _instance._model.LastComboCard.Accepts(card))
         {
+            var index = _instance._model.FieldStacks[card.Stack].IndexOf(card);
             _instance._model.FieldStacks[card.Stack].Remove(card);
             card.MyLocation = CardModel.Location.InEndStack;
             _instance._model.EndStack.Add(card);
             _instance._view.MoveToEndStack(card);
+            _instance._model.FieldStacks[card.Stack][index-1].IsOpen = true;
             return true;
         }
         else if (card.MyLocation == CardModel.Location.InDeck

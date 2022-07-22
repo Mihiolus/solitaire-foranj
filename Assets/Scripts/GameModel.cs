@@ -14,12 +14,20 @@ public class GameModel : MonoBehaviour
     public List<CardModel>[] FieldStacks { get => _fieldStacks; }
     public List<CardModel> EndStack { get => _endStack; }
 
-    public void Init(int groupNumber)
+    public void Init(List<CardModel>[] fieldStacks, List<CardModel> deck)
     {
-        _fieldStacks = new List<CardModel>[groupNumber];
-        for (int i = 0; i < 4; i++)
+        _fieldStacks = fieldStacks;
+        foreach (var stack in fieldStacks)
         {
-            _fieldStacks[i] = new List<CardModel>();
+            foreach (var card in stack)
+            {
+                card.MyLocation = CardModel.Location.OnField;
+            }
+        }
+        _deck = deck;
+        foreach (var card in deck)
+        {
+            card.MyLocation = CardModel.Location.InDeck;
         }
     }
 }
