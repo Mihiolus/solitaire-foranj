@@ -12,6 +12,8 @@ public class Generator : MonoBehaviour
     [SerializeField]
     private RectTransform _deck;
     private List<Sprite>[] sortedSprites;
+    [SerializeField]
+    private GameModel _model;
 
     // Start is called before the first frame update
     void Start()
@@ -36,7 +38,7 @@ public class Generator : MonoBehaviour
                 }
                 if (i == g.Length - 1)
                 {
-                    card.GetComponent<CardView>().IsOpen = true;
+                    card.IsOpen = true;
                 }
             }
         }
@@ -131,9 +133,9 @@ public class Generator : MonoBehaviour
                     group = Random.Range(0, 4);
                 } while (lastIndexInGroup[group] < 0);
                 var card = cardGroups[group][lastIndexInGroup[group]];
-                CardModel cardModel1 = card.GetComponent<CardModel>();
-                cardModel1.Rank = value;
-                card.GetComponent<CardView>().SetFrontImage(sortedSprites[cardModel1.Rank][Random.Range(0, 4)]);
+                cardModel = card.GetComponent<CardModel>();
+                cardModel.Rank = value;
+                card.GetComponent<CardView>().SetFrontImage(sortedSprites[cardModel.Rank][Random.Range(0, 4)]);
                 lastIndexInGroup[group]--;
             }
         }
