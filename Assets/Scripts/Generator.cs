@@ -20,14 +20,26 @@ public class Generator : MonoBehaviour
     {
         var groups = GetSortedGroups();
         _sortedSprites = GetComponent<ISpriteLoader>().GetSortedSprites();
-        var combos = GetCombinations();
+        int cardsOnField = CountCards(groups);
+        var combos = GetCombinations(cardsOnField);
         List<CardModel> deck;
         InitShuffle(groups, combos, out deck);
         _model.Init(groups, deck);
         GameController.TryMoveCard(_model.Deck[_model.Deck.Count - 1]);
     }
 
-    ///<returns>Groups of card transforms as they are on the field under different parent transforms, sorted according to their order in the inspector</returns>
+    private static int CountCards(List<CardModel>[] groups)
+    {
+        int cardsOnField = 0;
+        foreach (var stack in groups)
+        {
+            cardsOnField += stack.Count;
+        }
+
+        return cardsOnField;
+    }
+
+    ///<returns>Groups of cards as they are on the field under different parent transforms, sorted according to their order in the inspector</returns>
     private List<CardModel>[] GetSortedGroups()
     {
         Dictionary<Transform, SortedList<int, Transform>> groups = new Dictionary<Transform, SortedList<int, Transform>>();
@@ -58,34 +70,33 @@ public class Generator : MonoBehaviour
         return results;
     }
 
-    private List<List<int>> GetCombinations()
+    ///<returns>Combinations of card ranks as ints</returns>
+    private List<List<int>> GetCombinations(int cardsOnField)
     {
         List<List<int>> results = new List<List<int>>();
-        int remainingCards = 40;
-        int start, number, value;
+        int length, rank;
         bool ascending;
-        while (remainingCards > 0)
+        while (cardsOnField > 0)
         {
-            start = Random.Range(0, 13);
+            rank = Random.Range(0, 13);
             results.Add(new List<int>());
-            results[results.Count - 1].Add(start);
-            value = start;
-            number = Mathf.Min(Random.Range(2, 8), remainingCards);
+            results[results.Count - 1].Add(rank);
+            length = Mathf.Min(Random.Range(2, 8), cardsOnField);
+            cardsOnField -= length;
             ascending = Random.value < _ascendingChance;
-            while (number > 0)
+            while (length > 0)
             {
-                value += ascending ? 1 : -1;
-                if (value > 12)
+                rank += ascending ? 1 : -1;
+                if (rank > 12)
                 {
-                    value = 0;
+                    rank = 0;
                 }
-                else if (value < 0)
+                else if (rank < 0)
                 {
-                    value = 12;
+                    rank = 12;
                 }
-                results[results.Count - 1].Add(value);
-                number--;
-                remainingCards--;
+                results[results.Count - 1].Add(rank);
+                length--;
                 ascending = Random.value < _directionChangeChance ? !ascending : ascending;
             }
         }
