@@ -7,6 +7,7 @@ public class GameView : MonoBehaviour
 
     public void MoveToEndStack(CardModel card)
     {
-        card.transform.SetParent(_endStack);
+        card.transform.SetParent(_endStack, false);
+        card.GetComponent<RectTransform>().anchoredPosition = Vector3.zero;
     }
 }
