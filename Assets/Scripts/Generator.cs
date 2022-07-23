@@ -11,7 +11,7 @@ public class Generator : MonoBehaviour
     private GameObject _deckPrefab;
     [SerializeField]
     private RectTransform _deck;
-    private List<Sprite>[] sortedSprites;
+    private List<Sprite>[] _sortedSprites;
     [SerializeField]
     private GameModel _model;
 
@@ -19,31 +19,11 @@ public class Generator : MonoBehaviour
     void Start()
     {
         var groups = GetSortedGroups();
-        sortedSprites = GetComponent<ISpriteLoader>().GetSortedSprites();
+        _sortedSprites = GetComponent<ISpriteLoader>().GetSortedSprites();
         var combos = GetCombinations();
         List<CardModel> deck;
         InitShuffle(groups, combos, out deck);
         _model.Init(groups, deck);
-        CardModel card;
-        foreach (var g in groups)
-        {
-            for (int i = 0; i < g.Count; i++)
-            {
-                card = g[i].GetComponent<CardModel>();
-                if (i > 0)
-                {
-                    card.Ancestor = g[i - 1].GetComponent<CardModel>();
-                }
-                if (i < g.Count - 1)
-                {
-                    card.Descendant = g[i + 1].GetComponent<CardModel>();
-                }
-                if (i == g.Count - 1)
-                {
-                    card.IsOpen = true;
-                }
-            }
-        }
         GameController.TryMoveCard(_model.Deck[_model.Deck.Count - 1]);
     }
 
@@ -126,7 +106,7 @@ public class Generator : MonoBehaviour
             deckCard.transform.SetAsFirstSibling();
             CardModel cardModel = deckCard.GetComponent<CardModel>();
             cardModel.Rank = combo[0];
-            deckCard.GetComponent<CardView>().SetFrontImage(sortedSprites[cardModel.Rank][Random.Range(0, 4)]);
+            deckCard.GetComponent<CardView>().SetFrontImage(_sortedSprites[cardModel.Rank][Random.Range(0, 4)]);
             deck.Add(cardModel);
             for (int i = 1; i < combo.Count; i++)
             {
@@ -139,7 +119,7 @@ public class Generator : MonoBehaviour
                 cardModel = cardGroups[group][lastIndexInGroup[group]];
                 cardModel.Rank = value;
                 cardModel.Stack = group;
-                cardModel.GetComponent<CardView>().SetFrontImage(sortedSprites[cardModel.Rank][Random.Range(0, 4)]);
+                cardModel.GetComponent<CardView>().SetFrontImage(_sortedSprites[cardModel.Rank][Random.Range(0, 4)]);
                 lastIndexInGroup[group]--;
             }
         }

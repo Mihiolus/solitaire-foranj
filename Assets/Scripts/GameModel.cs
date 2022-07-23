@@ -19,8 +19,21 @@ public class GameModel : MonoBehaviour
         _fieldStacks = fieldStacks;
         foreach (var stack in fieldStacks)
         {
-            foreach (var card in stack)
+            for (int i = 0; i < stack.Count; i++)
             {
+                var card = stack[i];
+                if (i > 0)
+                {
+                    card.Ancestor = stack[i - 1];
+                }
+                if (i < stack.Count - 1)
+                {
+                    card.Descendant = stack[i + 1];
+                }
+                if (i == stack.Count - 1)
+                {
+                    card.IsOpen = true;
+                }
                 card.MyLocation = CardModel.Location.OnField;
             }
         }
