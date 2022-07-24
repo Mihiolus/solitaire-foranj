@@ -21,9 +21,7 @@ public class GameController : MonoBehaviour
         {
             var index = _instance._model.FieldStacks[card.Stack].IndexOf(card);
             _instance._model.FieldStacks[card.Stack].Remove(card);
-            card.MyLocation = CardModel.Location.InEndStack;
-            _instance._model.EndStack.Add(card);
-            _instance._view.MoveToEndStack(card);
+            _instance.AddToEndStack(card);
             if (card.Ancestor)
             {
                 card.Ancestor.IsOpen = true;
@@ -34,12 +32,17 @@ public class GameController : MonoBehaviour
         && _instance._model.LastDeckCard == card)
         {
             _instance._model.Deck.Remove(card);
-            card.MyLocation = CardModel.Location.InEndStack;
             card.IsOpen = true;
-            _instance._view.MoveToEndStack(card);
-            _instance._model.EndStack.Add(card);
+            _instance.AddToEndStack(card);
             return true;
         }
         return false;
+    }
+
+    private void AddToEndStack(CardModel card)
+    {
+        card.MyLocation = CardModel.Location.InEndStack;
+        _model.EndStack.Add(card);
+        _view.MoveToEndStack(card);
     }
 }
